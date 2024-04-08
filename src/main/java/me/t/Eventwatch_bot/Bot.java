@@ -28,16 +28,38 @@ public class Bot extends TelegramLongPollingBot {
     public void onUpdateReceived(Update update) {
         var msg = update.getMessage();
         var user = msg.getFrom();
-        userId = user.getId();
+        var userId = user.getId();
+        var usersMessage = msg.getText();
 
-        System.out.println(user.getFirstName() + " wrote " + msg.getText());
-        System.out.println(update);
-        sendText(userId, "Hello crypto enthusiast! Now I can only send this message, but more functionality is coming.");
+        if (msg.isCommand()) {
+            String command = msg.getText();
+            switch (command) {
+                case "/start":
+                    sendText(userId, "This bot can show you a list of crypto events. Simply type '/showallevents'.");
+                    break;
+                case "/help":
+                    sendText(userId, "This bot supports the following commands: /start, /help and /showallevents.");
+                    break;
+                case "/settings":
+                    sendText(userId, "WIP settings default location and crypto topics.");
+                    break;
+                case "/showallevents":
+                    sendText(userId, "WIP list of events.");
+                    break;
+                default:
+                    sendText(userId, "Such command does not exist.");
+                    break;
+            }
+        }
+        else {
+            sendText(userId, "I see that you wrote '" + usersMessage + "'. Right now, I don't have a reply for that.");
+        }
     }
 
     //================================================================================
     // Bot functionality
     //================================================================================
+
     public void sendText(Long who, String what) {
         SendMessage sm = SendMessage.builder()
                 .chatId(who.toString())
