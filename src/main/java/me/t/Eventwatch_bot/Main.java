@@ -6,7 +6,12 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 public class Main {
     public static void main(String[] args) throws TelegramApiException {
         TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-        Bot bot = new Bot();
-        botsApi.registerBot(bot);
+        try {
+            Bot bot = new Bot();
+            botsApi.registerBot(bot);
+        }
+        catch (TelegramApiException e) {
+            // record logs here
+        }
     }
 }
