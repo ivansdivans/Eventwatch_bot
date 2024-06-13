@@ -6,16 +6,21 @@ import java.util.List;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
+import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
 import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.webapp.WebAppInfo;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class Bot extends TelegramLongPollingBot {
 
     public Bot() {
         List<BotCommand> listOfCommands = new ArrayList<>();
-        listOfCommands.add(new BotCommand("/showevents", "Open web app"));
+        listOfCommands.add(new BotCommand("/showevents", "Browse crypto events"));
         listOfCommands.add(new BotCommand("/settings", "Set your default settings"));
         listOfCommands.add(new BotCommand("/help", "List of supported commands"));
         try {
@@ -50,7 +55,7 @@ public class Bot extends TelegramLongPollingBot {
                         startCommandReceived(chatId, usersFirstName);
                         break;
                     case "/showevents":
-                        sendMessage(chatId, "List of events.");
+                        showEventsCommandReceived(chatId);
                         break;
                     case "/settings":
                         sendMessage(chatId, "Set your default location and crypto topics.");
@@ -84,5 +89,35 @@ public class Bot extends TelegramLongPollingBot {
     private void startCommandReceived(long chatId, String name) {
         String answer = "Hi, " + name + "! This bot can show you a list of crypto events. Simply press menu button and select 'Show events'.";
         sendMessage(chatId, answer);
+    }
+
+    private void showEventsCommandReceived(long chatId) {
+        SendPhoto messageWithPhoto = SendPhoto
+                .builder()
+                .chatId(chatId)
+                .photo(new InputFile("https://picsum.photos/200"))
+                .caption("Please tap the button below 👇")
+                .build();
+
+        InlineKeyboardMarkup inlineKeyboardMarkup = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline = new ArrayList<>();
+        InlineKeyboardButton webAppButton = new InlineKeyboardButton();
+
+        WebAppInfo webApp = new WebAppInfo("https://ivansdivans.github.io/Eventwatch_tma/");
+        webAppButton.setText("Crypto events");
+        webAppButton.setWebApp(webApp);
+
+        rowInline.add(webAppButton);
+        rowsInline.add(rowInline);
+        inlineKeyboardMarkup.setKeyboard(rowsInline);
+
+        messageWithPhoto.setReplyMarkup(inlineKeyboardMarkup);
+
+        try {
+            execute(messageWithPhoto);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
