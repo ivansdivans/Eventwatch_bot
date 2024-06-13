@@ -17,8 +17,8 @@ import org.telegram.telegrambots.meta.api.objects.webapp.WebAppInfo;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class Bot extends TelegramLongPollingBot {
-
-    public Bot() {
+    public Bot(String botToken) {
+        super(botToken);
         List<BotCommand> listOfCommands = new ArrayList<>();
         listOfCommands.add(new BotCommand("/showevents", "Browse crypto events"));
         listOfCommands.add(new BotCommand("/settings", "Set your default settings"));
@@ -26,18 +26,13 @@ public class Bot extends TelegramLongPollingBot {
         try {
             this.execute(new SetMyCommands(listOfCommands, new BotCommandScopeDefault(), null));
         } catch (TelegramApiException e) {
-            // log exception
+            // record logs here
         }
     }
 
     @Override
     public String getBotUsername() {
         return "Eventwatch_bot";
-    }
-
-    @Override
-    public String getBotToken() {
-        return Utilities.getSecretProperty("botToken");
     }
 
     @Override
