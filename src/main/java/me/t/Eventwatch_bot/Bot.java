@@ -1,15 +1,29 @@
 package me.t.Eventwatch_bot;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.methods.commands.SetMyCommands;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.commands.BotCommand;
+import org.telegram.telegrambots.meta.api.objects.commands.scope.BotCommandScopeDefault;
+import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+
 public class Bot extends TelegramLongPollingBot {
+
+    public Bot() {
+        List<BotCommand> listOfCommands = new ArrayList<>();
+        listOfCommands.add(new BotCommand("/showevents", "Open web app"));
+        listOfCommands.add(new BotCommand("/settings", "Set your default settings"));
+        listOfCommands.add(new BotCommand("/help", "List of supported commands"));
+        try {
+            this.execute(new SetMyCommands(listOfCommands, new BotCommandScopeDefault(), null));
+        } catch (TelegramApiException e) {
+            // log exception
+        }
+    }
 
     @Override
     public String getBotUsername() {
@@ -29,36 +43,20 @@ public class Bot extends TelegramLongPollingBot {
             var usersMessage = msg.getText();
             var usersFirstName = msg.getChat().getFirstName();
 
-//            ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
-//            keyboardMarkup.setResizeKeyboard(true);
-//            List<KeyboardRow> keyboardRows = new ArrayList<>();
-//
-//            KeyboardRow row1 = new KeyboardRow();
-//            row1.add("My tracked events");
-//            keyboardRows.add(row1);
-//
-//            KeyboardRow row2 = new KeyboardRow();
-//            row2.add("Help");
-//            row2.add("Settings");
-//            keyboardRows.add(row2);
-//
-//            keyboardMarkup.setKeyboard(keyboardRows);
-//            msg.setReplyMarkup(keyboardMarkup);
-
             if (msg.isCommand()) {
                 String command = msg.getText();
                 switch (command) {
                     case "/start":
                         startCommandReceived(chatId, usersFirstName);
                         break;
-                    case "/help":
-                        sendMessage(chatId, "This bot supports the following commands: /start, /help and /showallevents.");
+                    case "/showevents":
+                        sendMessage(chatId, "List of events.");
                         break;
                     case "/settings":
-                        sendMessage(chatId, "WIP settings default location and crypto topics.");
+                        sendMessage(chatId, "Set your default location and crypto topics.");
                         break;
-                    case "/showallevents":
-                        sendMessage(chatId, "WIP list of events.");
+                    case "/help":
+                        sendMessage(chatId, "This bot supports the following commands: /start, /help and /showallevents.");
                         break;
                     default:
                         sendMessage(chatId, "Such command does not exist.");
@@ -84,7 +82,7 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     private void startCommandReceived(long chatId, String name) {
-        String answer = "Hi, " + name + "! This bot can show you a list of crypto events. Simply press menu button 'Show events'.";
+        String answer = "Hi, " + name + "! This bot can show you a list of crypto events. Simply press menu button and select 'Show events'.";
         sendMessage(chatId, answer);
     }
 }
